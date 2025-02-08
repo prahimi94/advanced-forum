@@ -7,6 +7,7 @@ DROP TABLE IF EXISTS "post_categories";
 DROP TABLE IF EXISTS "posts";
 DROP TABLE IF EXISTS "categories";
 DROP TABLE IF EXISTS  "sessions";
+DROP TABLE IF EXISTS "friends";
 DROP TABLE IF EXISTS "users";
 
 CREATE TABLE "categories" (
@@ -33,6 +34,20 @@ CREATE TABLE "users" (
   "created_at" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   "updated_at" DATETIME,
   "updated_by" INTEGER,
+  FOREIGN KEY (updated_by) REFERENCES "users" ("id")
+);
+CREATE TABLE "friends" (
+  "id" INTEGER PRIMARY KEY,
+  "first_user_id" INTEGER NOT NULL,
+  "second_user_id" INTEGER NOT NULL,
+  "status" TEXT NOT NULL CHECK ("status" IN ('pending', 'accepted', 'delete')) DEFAULT 'pending',
+  "created_at" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "created_by" INTEGER NOT NULL,
+  "updated_at" DATETIME,
+  "updated_by" INTEGER,
+  FOREIGN KEY (first_user_id) REFERENCES "users" ("id"),
+  FOREIGN KEY (second_user_id) REFERENCES "users" ("id"),
+  FOREIGN KEY (created_by) REFERENCES "users" ("id"),
   FOREIGN KEY (updated_by) REFERENCES "users" ("id")
 );
 CREATE TABLE "posts" (
