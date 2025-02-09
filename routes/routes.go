@@ -32,7 +32,9 @@ func SetupRoutes() *mux.Router {
 	// Protected routes (using middleware)
 	protectedRoutes := router.PathPrefix("/").Subrouter()
 	protectedRoutes.Use(middlewares.AuthMiddleware) // Apply AuthMiddleware to protectedRoutes routes
-	protectedRoutes.HandleFunc("/newPost/", forumManagementControllers.CreatePost).Methods("GET", "POST")
+	protectedRoutes.HandleFunc("/profile", userManagementControllers.EditUser).Methods("GET")
+	protectedRoutes.HandleFunc("/updateUser", userManagementControllers.UpdateUser).Methods("POST")
+	protectedRoutes.HandleFunc("/newPost/", forumManagementControllers.CreatePost).Methods("GET")
 	protectedRoutes.HandleFunc("/submitPost", forumManagementControllers.SubmitPost).Methods("POST")
 	protectedRoutes.HandleFunc("/editPost/{id}", forumManagementControllers.EditPost).Methods("GET")
 	protectedRoutes.HandleFunc("/updatePost", forumManagementControllers.UpdatePost).Methods("POST")

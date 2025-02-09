@@ -76,16 +76,17 @@ func InsertUser(user *User) (int, error) {
 	return int(userId), nil
 }
 
-func UpdateProfilePhoto(user *User) error {
+func UpdateUser(user *User) error {
 	db := db.OpenDBConnection()
 	defer db.Close() // Close the connection after the function finishes
 
 	updateUser := `UPDATE users
-					SET profile_photo = ?,
+					SET name = ?,
+						profile_photo = ?,
 						updated_at = CURRENT_TIMESTAMP,
 						updated_by = ?
 					WHERE id = ?;`
-	_, updateErr := db.Exec(updateUser, user.ProfilePhoto, user.ID, user.ID)
+	_, updateErr := db.Exec(updateUser, user.Name, user.ProfilePhoto, user.ID, user.ID)
 	if updateErr != nil {
 		return updateErr
 	}

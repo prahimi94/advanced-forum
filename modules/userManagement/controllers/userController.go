@@ -6,7 +6,6 @@ import (
 	"forum/modules/userManagement/models"
 	"forum/utils"
 	"net/http"
-	"strconv"
 	"strings"
 	"text/template"
 	"time"
@@ -17,6 +16,7 @@ import (
 )
 
 const publicUrl = "modules/userManagement/views/"
+const forumPublicUrl = "modules/forumManagement/views/"
 
 var u1 = uuid.Must(uuid.NewV4())
 
@@ -169,73 +169,6 @@ func renderAuthPage(w http.ResponseWriter, errorMsg string) {
 	tmpl.Execute(w, AuthPageErrorData{ErrorMessage: errorMsg})
 }
 
-func UpdateProfilePhoto(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		errorManagementControllers.HandleErrorPage(w, r, errorManagementControllers.MethodNotAllowedError)
-		return
-	}
-
-	loginStatus, loginUser, _, checkLoginError := CheckLogin(w, r)
-	if checkLoginError != nil {
-		errorManagementControllers.HandleErrorPage(w, r, errorManagementControllers.InternalServerError)
-		return
-	}
-	if loginStatus {
-		fmt.Println("logged in userid is: ", loginUser.ID)
-		// return
-	} else {
-		errorManagementControllers.HandleErrorPage(w, r, errorManagementControllers.UnauthorizedError)
-		return
-	}
-
-	const maxUploadSize = 2 << 20 // 2 MB
-
-	// Limit the request body size
-	r.Body = http.MaxBytesReader(w, r.Body, maxUploadSize)
-
-	file, handler, err := r.FormFile("profile_photo")
-	if err != nil {
-		http.Error(w, "File is too large or missing", http.StatusBadRequest)
-		return
-	}
-	defer file.Close()
-
-	// Extra safety: check file size from the header
-	if handler.Size > maxUploadSize {
-		http.Error(w, "File size exceeds the 2MB limit", http.StatusRequestEntityTooLarge)
-		return
-	}
-
-	idStr := r.FormValue("id")
-
-	id, err := strconv.Atoi(idStr)
-	if err != nil {
-		errorManagementControllers.HandleErrorPage(w, r, errorManagementControllers.InternalServerError)
-		return
-	}
-
-	// Call your file upload function
-	uploadedFile, err := utils.FileUpload(file, handler)
-	if err != nil {
-		errorManagementControllers.HandleErrorPage(w, r, errorManagementControllers.InternalServerError)
-		return
-	}
-
-	user := &models.User{
-		ID:           id,
-		ProfilePhoto: uploadedFile,
-	}
-
-	// Update a record while checking duplicates
-	updateError := models.UpdateProfilePhoto(user)
-	if updateError != nil {
-		errorManagementControllers.HandleErrorPage(w, r, errorManagementControllers.InternalServerError)
-		return
-	}
-
-	RedirectToIndex(w, r)
-}
-
 func sessionGenerator(w http.ResponseWriter, r *http.Request, userId int) {
 	session := &models.Session{
 		UserId: userId,
@@ -277,24 +210,6 @@ func CheckLogin(w http.ResponseWriter, r *http.Request) (bool, models.User, stri
 	return true, user, sessionToken, nil
 }
 
-func RedirectToIndex(w http.ResponseWriter, r *http.Request) {
-	http.Redirect(w, r, "/", http.StatusFound)
-}
-
-func RedirectToHome(w http.ResponseWriter, r *http.Request) {
-	http.Redirect(w, r, "/home/", http.StatusFound)
-}
-
-func RedirectToPrevPage(w http.ResponseWriter, r *http.Request) {
-	referrer := r.Header.Get("Referer")
-	if referrer == "" {
-		referrer = "/"
-	}
-
-	// Redirect back to the original page to reload it
-	http.Redirect(w, r, referrer, http.StatusSeeOther)
-}
-
 func Logout(w http.ResponseWriter, r *http.Request) {
 	loginStatus, _, sessionToken, checkLoginError := CheckLogin(w, r)
 	if checkLoginError != nil {
@@ -315,6 +230,136 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 
 	deleteCookie(w, "session_token") // Deleting a cookie named "session_token"
 	RedirectToIndex(w, r)
+}
+
+func EditUser(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		errorManagementControllers.HandleErrorPage(w, r, errorManagementControllers.MethodNotAllowedError)
+		return
+	}
+
+	loginStatus, loginUser, _, checkLoginError := CheckLogin(w, r)
+	if checkLoginError != nil {
+		errorManagementControllers.HandleErrorPage(w, r, errorManagementControllers.InternalServerError)
+		return
+	}
+	if loginStatus {
+		fmt.Println("logged in userid is: ", loginUser.ID)
+		// return
+	} else {
+		errorManagementControllers.HandleErrorPage(w, r, errorManagementControllers.UnauthorizedError)
+		return
+	}
+
+	data_obj_sender := struct {
+		LoginUser models.User
+	}{
+		LoginUser: loginUser,
+	}
+
+	tmpl, err := template.ParseFiles(
+		publicUrl+"edit_user.html",
+		forumPublicUrl+"templates/header.html",
+		forumPublicUrl+"templates/navbar.html",
+		forumPublicUrl+"templates/footer.html",
+	)
+	if err != nil {
+		errorManagementControllers.HandleErrorPage(w, r, errorManagementControllers.InternalServerError)
+		return
+	}
+
+	err = tmpl.Execute(w, data_obj_sender)
+	if err != nil {
+		errorManagementControllers.HandleErrorPage(w, r, errorManagementControllers.InternalServerError)
+		return
+	}
+}
+
+func UpdateUser(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		errorManagementControllers.HandleErrorPage(w, r, errorManagementControllers.MethodNotAllowedError)
+		return
+	}
+
+	loginStatus, loginUser, _, checkLoginError := CheckLogin(w, r)
+	if checkLoginError != nil {
+		errorManagementControllers.HandleErrorPage(w, r, errorManagementControllers.InternalServerError)
+		return
+	}
+	if loginStatus {
+		fmt.Println("logged in userid is: ", loginUser.ID)
+		// return
+	} else {
+		errorManagementControllers.HandleErrorPage(w, r, errorManagementControllers.UnauthorizedError)
+		return
+	}
+
+	const maxUploadSize = 2 << 20 // 2 MB
+
+	// Limit the request body size
+	r.Body = http.MaxBytesReader(w, r.Body, maxUploadSize)
+
+	name := r.FormValue("name")
+
+	if len(name) == 0 {
+		errorManagementControllers.HandleErrorPage(w, r, errorManagementControllers.BadRequestError)
+		return
+	}
+
+	profile_photo_file, handler, err := r.FormFile("profile_photo")
+	if err != nil {
+		// "File is too large or missing"
+		errorManagementControllers.HandleErrorPage(w, r, errorManagementControllers.BadRequestError)
+		return
+	}
+	defer profile_photo_file.Close()
+
+	// Extra safety: check file size from the header
+	if handler.Size > maxUploadSize {
+		// "File is too large or missing"
+		errorManagementControllers.HandleErrorPage(w, r, errorManagementControllers.BadRequestError)
+		return
+	}
+
+	// Call your file upload function
+	profile_photo, err := utils.FileUpload(profile_photo_file, handler)
+	if err != nil {
+		errorManagementControllers.HandleErrorPage(w, r, errorManagementControllers.InternalServerError)
+		return
+	}
+
+	user := &models.User{
+		ID:           loginUser.ID,
+		Name:         name,
+		ProfilePhoto: profile_photo,
+	}
+
+	// Update a record while checking duplicates
+	updateError := models.UpdateUser(user)
+	if updateError != nil {
+		errorManagementControllers.HandleErrorPage(w, r, errorManagementControllers.InternalServerError)
+		return
+	}
+
+	RedirectToIndex(w, r)
+}
+
+func RedirectToIndex(w http.ResponseWriter, r *http.Request) {
+	http.Redirect(w, r, "/", http.StatusFound)
+}
+
+func RedirectToHome(w http.ResponseWriter, r *http.Request) {
+	http.Redirect(w, r, "/home/", http.StatusFound)
+}
+
+func RedirectToPrevPage(w http.ResponseWriter, r *http.Request) {
+	referrer := r.Header.Get("Referer")
+	if referrer == "" {
+		referrer = "/"
+	}
+
+	// Redirect back to the original page to reload it
+	http.Redirect(w, r, referrer, http.StatusSeeOther)
 }
 
 func deleteCookie(w http.ResponseWriter, cookieName string) {
