@@ -13,6 +13,8 @@ import (
 type Category struct {
 	ID        int                       `json:"id"`
 	Name      string                    `json:"name"`
+	Color     string                    `json:"color"`
+	Icon      string                    `json:"icon"`
 	Status    string                    `json:"status"`
 	CreatedAt time.Time                 `json:"created_at"`
 	UpdatedAt *time.Time                `json:"updated_at"`
@@ -25,8 +27,8 @@ func InsertCategory(category *Category) (int, error) {
 	db := db.OpenDBConnection()
 	defer db.Close() // Close the connection after the function finishes
 
-	insertQuery := `INSERT INTO categories (name) VALUES (?);`
-	result, insertErr := db.Exec(insertQuery, category.Name)
+	insertQuery := `INSERT INTO categories (name, color, icon) VALUES (?, ?, ?);`
+	result, insertErr := db.Exec(insertQuery, category.Name, category.Color, category.Icon)
 	if insertErr != nil {
 		// Check if the error is a SQLite constraint violation
 		if sqliteErr, ok := insertErr.(interface{ ErrorCode() int }); ok {
@@ -53,10 +55,12 @@ func UpdateCategory(category *Category, userId int) error {
 
 	updateQuery := `UPDATE categories
 					SET name = ?,
+						color = ?,
+						icon = ?,
 						updated_at = CURRENT_TIMESTAMP,
 						updated_by = ?
 					WHERE id = ?;`
-	_, updateErr := db.Exec(updateQuery, category.Name, userId, category.ID)
+	_, updateErr := db.Exec(updateQuery, category.Name, category.Color, category.Icon, userId, category.ID)
 	if updateErr != nil {
 		// Check if the error is a SQLite constraint violation
 		if sqliteErr, ok := updateErr.(interface{ ErrorCode() int }); ok {
@@ -99,10 +103,10 @@ func ReadAllCategories() ([]Category, error) {
 
 	// Query the records
 	rows, selectError := db.Query(`
-        SELECT c.id as category_id, c.name as category_name, c.status as category_status, 
+        SELECT c.id as category_id, c.name as category_name, c.color as category_color, c.icon as category_icon, c.status as category_status, 
                c.created_at as category_created_at, c.created_by as category_created_by, 
                c.updated_at as category_updated_at, c.updated_by as category_updated_by,
-               u.id as user_id, u.name as user_name, u.username as user_username, u.email as user_email
+               u.id as user_id, u.name as user_name, u.username as user_username, u.email as user_email, IFNULL(u.profile_photo, '') as user_profile_photo
         FROM categories c
         INNER JOIN users u ON c.created_by = u.id
         WHERE c.status != 'delete';
@@ -120,9 +124,9 @@ func ReadAllCategories() ([]Category, error) {
 
 		// Scan the data into variables
 		err := rows.Scan(
-			&category.ID, &category.Name, &category.Status, &category.CreatedAt, &category.CreatedBy,
+			&category.ID, &category.Name, &category.Color, &category.Icon, &category.Status, &category.CreatedAt, &category.CreatedBy,
 			&category.UpdatedAt, &category.UpdatedBy,
-			&user.ID, &user.Name, &user.Username, &user.Email,
+			&user.ID, &user.Name, &user.Username, &user.Email, &user.ProfilePhoto,
 		)
 		if err != nil {
 			return nil, fmt.Errorf("error scanning row: %v", err)
@@ -149,10 +153,10 @@ func ReadCategoryById(categoryId int) (Category, error) {
 
 	// Query the records
 	rows, selectError := db.Query(`
-        SELECT c.id as category_id, c.name as category_name, c.status as category_status, 
+        SELECT c.id as category_id, c.name as category_name, c.color as category_color, c.icon as category_icon, c.status as category_status, 
                c.created_at as category_created_at, c.created_by as category_created_by, 
                c.updated_at as category_updated_at, c.updated_by as category_updated_by,
-               u.id as user_id, u.name as user_name, u.username as user_username, u.email as user_email
+               u.id as user_id, u.name as user_name, u.username as user_username, u.email as user_email, IFNULL(u.profile_photo, '') as user_profile_photo
         FROM categories c
         INNER JOIN users u ON c.created_by = u.id  -- Fixed the JOIN to use the correct column for user relation
         WHERE c.status != 'delete'
@@ -170,9 +174,9 @@ func ReadCategoryById(categoryId int) (Category, error) {
 	// Scan the result into variables
 	if rows.Next() {
 		err := rows.Scan(
-			&category.ID, &category.Name, &category.Status, &category.CreatedAt, &category.CreatedBy,
+			&category.ID, &category.Name, &category.Color, &category.Icon, &category.Status, &category.CreatedAt, &category.CreatedBy,
 			&category.UpdatedAt, &category.UpdatedBy,
-			&user.ID, &user.Name, &user.Username, &user.Email,
+			&user.ID, &user.Name, &user.Username, &user.Email, &user.ProfilePhoto,
 		)
 		if err != nil {
 			return Category{}, fmt.Errorf("error scanning row: %v", err)
@@ -199,10 +203,10 @@ func ReadCategoryByName(categoryName string) (Category, error) {
 
 	// Query the records
 	rows, selectError := db.Query(`
-        SELECT c.id as category_id, c.name as category_name, c.status as category_status, 
+        SELECT c.id as category_id, c.name as category_name, c.color as category_color, c.icon as category_icon, c.status as category_status, 
                c.created_at as category_created_at, c.created_by as category_created_by, 
                c.updated_at as category_updated_at, c.updated_by as category_updated_by,
-               u.id as user_id, u.name as user_name, u.username as user_username, u.email as user_email
+               u.id as user_id, u.name as user_name, u.username as user_username, u.email as user_email, IFNULL(u.profile_photo, '') as user_profile_photo
         FROM categories c
         INNER JOIN users u ON c.created_by = u.id  -- Fixed the JOIN to use the correct column for user relation
         WHERE c.status != 'delete'
@@ -220,9 +224,9 @@ func ReadCategoryByName(categoryName string) (Category, error) {
 	// Scan the result into variables
 	if rows.Next() {
 		err := rows.Scan(
-			&category.ID, &category.Name, &category.Status, &category.CreatedAt, &category.CreatedBy,
+			&category.ID, &category.Name, &category.Color, &category.Icon, &category.Status, &category.CreatedAt, &category.CreatedBy,
 			&category.UpdatedAt, &category.UpdatedBy,
-			&user.ID, &user.Name, &user.Username, &user.Email,
+			&user.ID, &user.Name, &user.Username, &user.Email, &user.ProfilePhoto,
 		)
 		if err != nil {
 			return Category{}, fmt.Errorf("error scanning row: %v", err)

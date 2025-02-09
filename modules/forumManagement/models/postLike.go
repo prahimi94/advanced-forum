@@ -79,8 +79,8 @@ func ReadAllPostsLikes() ([]PostLike, error) {
         SELECT 
 			pl.id as post_like_id, pl.type, pl.status as post_like_status, pl.created_at as post_like_created_at, pl.updated_at as post_like_updated_at, pl.updated_by as post_like_updated_by,
 			p.id as post_id, p.status as post_status, p.created_at as post_created_at, p.updated_at as post_updated_at, p.updated_by as post_updated_by,
-			u.id as user_id, u.name as user_name, u.username as user_username, u.email as user_email,
-			c.id as category_id, c.name as category_name
+			u.id as user_id, u.name as user_name, u.username as user_username, u.email as user_email, IFNULL(u.profile_photo, '') as user_profile_photo,
+			c.id as category_id, c.name as category_name, c.color as category_color, c.icon as category_icon
 		FROM post_likes pl
 			INNER JOIN posts p
 				ON pl.post_id = p.id	
@@ -116,8 +116,8 @@ func ReadAllPostsLikes() ([]PostLike, error) {
 		err := rows.Scan(
 			&postLike.ID, &postLike.Type, &postLike.Status, &postLike.CreatedAt, &postLike.UpdatedAt, &postLike.UpdatedBy,
 			&post.ID, &post.Status, &post.CreatedAt, &post.UpdatedAt, &post.UpdatedBy,
-			&user.ID, &user.Name, &user.Username, &user.Email,
-			&category.ID, &category.Name,
+			&user.ID, &user.Name, &user.Username, &user.Email, &user.ProfilePhoto,
+			&category.ID, &category.Name, &category.Color, &category.Icon,
 		)
 		if err != nil {
 			return nil, fmt.Errorf("error scanning row: %v", err)
@@ -158,8 +158,8 @@ func ReadPostsLikeByUserId(userId int) ([]PostLike, error) {
         SELECT 
 			pl.id as post_like_id, pl.type, pl.status as post_like_status, pl.created_at as post_like_created_at, pl.updated_at as post_like_updated_at, pl.updated_by as post_like_updated_by,
 			p.id as post_id, p.status as post_status, p.created_at as post_created_at, p.updated_at as post_updated_at, p.updated_by as post_updated_by,
-			u.id as user_id, u.name as user_name, u.username as user_username, u.email as user_email,
-			c.id as category_id, c.name as category_name
+			u.id as user_id, u.name as user_name, u.username as user_username, u.email as user_email, IFNULL(u.profile_photo, '') as user_profile_photo, 
+			c.id as category_id, c.name as category_name, c.color as category_color, c.icon as category_icon
 		FROM post_likes pl
 			INNER JOIN posts p
 				ON pl.post_id = p.id	
@@ -196,8 +196,8 @@ func ReadPostsLikeByUserId(userId int) ([]PostLike, error) {
 		err := rows.Scan(
 			&postLike.ID, &postLike.Type, &postLike.Status, &postLike.CreatedAt, &postLike.UpdatedAt, &postLike.UpdatedBy,
 			&post.ID, &post.Status, &post.CreatedAt, &post.UpdatedAt, &post.UpdatedBy,
-			&user.ID, &user.Name, &user.Username, &user.Email,
-			&category.ID, &category.Name,
+			&user.ID, &user.Name, &user.Username, &user.Email, &user.ProfilePhoto,
+			&category.ID, &category.Name, &category.Color, &category.Icon,
 		)
 		if err != nil {
 			return nil, fmt.Errorf("error scanning row: %v", err)
@@ -238,8 +238,8 @@ func ReadPostsLikeByPostId(postId int) ([]PostLike, error) {
         SELECT 
 			pl.id as post_like_id, pl.type, pl.status as post_like_status, pl.created_at as post_like_created_at, pl.updated_at as post_like_updated_at, pl.updated_by as post_like_updated_by,
 			p.id as post_id, p.status as post_status, p.created_at as post_created_at, p.updated_at as post_updated_at, p.updated_by as post_updated_by,
-			u.id as user_id, u.name as user_name, u.username as user_username, u.email as user_email,
-			c.id as category_id, c.name as category_name
+			u.id as user_id, u.name as user_name, u.username as user_username, u.email as user_email, IFNULL(u.profile_photo, '') as user_profile_photo, 
+			c.id as category_id, c.name as category_name, c.color as category_color, c.icon as category_icon
 		FROM post_likes pl
 			INNER JOIN posts p
 				ON pl.post_id = p.id	
@@ -276,8 +276,8 @@ func ReadPostsLikeByPostId(postId int) ([]PostLike, error) {
 		err := rows.Scan(
 			&postLike.ID, &postLike.Type, &postLike.Status, &postLike.CreatedAt, &postLike.UpdatedAt, &postLike.UpdatedBy,
 			&post.ID, &post.Status, &post.CreatedAt, &post.UpdatedAt, &post.UpdatedBy,
-			&user.ID, &user.Name, &user.Username, &user.Email,
-			&category.ID, &category.Name,
+			&user.ID, &user.Name, &user.Username, &user.Email, &user.ProfilePhoto,
+			&category.ID, &category.Name, &category.Color, &category.Icon,
 		)
 		if err != nil {
 			return nil, fmt.Errorf("error scanning row: %v", err)

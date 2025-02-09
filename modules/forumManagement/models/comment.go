@@ -89,7 +89,7 @@ func ReadAllComments() ([]Comment, error) {
 			p.status AS post_status, p.created_at AS post_created_at, p.updated_at AS post_updated_at, p.updated_by AS post_updated_by,
 			c.id AS comment_id, c.post_id AS comment_post_id ,c.description AS comment_description,c.user_id AS comment_user_id, 
 			c.status AS comment_status, c.created_at AS comment_created_at, c.updated_at AS comment_updated_at, c.updated_by AS comment_updated_by,
-			u.id AS user_id, u.uuid AS user_uuid, u.username AS user_username, u.name AS user_name, u.type AS user_type, u.email AS user_email,  
+			u.id AS user_id, u.uuid AS user_uuid, u.username AS user_username, u.name AS user_name, u.type AS user_type, u.email AS user_email, IFNULL(u.profile_photo, '') as user_profile_photo, 
 			u.status AS user_status, u.created_at AS user_created_at, u.updated_at AS user_updated_at, u.updated_by AS user_updated_by
 		FROM comments c
 		INNER JOIN posts p ON c.post_id = p.id AND p.status != 'delete' AND c.status != 'delete'
@@ -134,6 +134,7 @@ func ReadAllComments() ([]Comment, error) {
 			&user.Name,
 			&user.Type,
 			&user.Email,
+			&user.ProfilePhoto,
 			&user.Status,
 			&user.CreatedAt,
 			&user.UpdatedAt,
@@ -235,7 +236,7 @@ func ReadAllCommentsForPost(postId int) ([]Comment, error) {
 	// Updated query to join comments with posts
 	selectQuery := `
 		SELECT 
-			u.id AS user_id, u.uuid AS user_uuid, u.username AS user_username, u.name AS user_name, u.type AS user_type, u.email AS user_email,  
+			u.id AS user_id, u.uuid AS user_uuid, u.username AS user_username, u.name AS user_name, u.type AS user_type, u.email AS user_email, IFNULL(u.profile_photo, '') as user_profile_photo, 
 			u.status AS user_status, u.created_at AS user_created_at, u.updated_at AS user_updated_at, u.updated_by AS user_updated_by,
 			c.id AS comment_id, c.post_id as comment_post_id, c.user_id AS comment_user_id, c.description AS comment_description, 
 			c.status AS comment_status, c.created_at AS comment_created_at, c.updated_at AS comment_updated_at, c.updated_by AS comment_updated_by,
@@ -266,6 +267,7 @@ func ReadAllCommentsForPost(postId int) ([]Comment, error) {
 			&user.Name,
 			&user.Type,
 			&user.Email,
+			&user.ProfilePhoto,
 			&user.Status,
 			&user.CreatedAt,
 			&user.UpdatedAt,
@@ -327,7 +329,7 @@ func ReadAllCommentsForPostByUserID(postId int, userID int) ([]Comment, error) {
 	// Updated query to join comments with posts
 	selectQuery := `
 		SELECT 
-			u.id AS user_id, u.uuid AS user_uuid, u.username AS user_username, u.name AS user_name, u.type AS user_type, u.email AS user_email,  
+			u.id AS user_id, u.uuid AS user_uuid, u.username AS user_username, u.name AS user_name, u.type AS user_type, u.email AS user_email, IFNULL(u.profile_photo, '') as user_profile_photo, 
 			u.status AS user_status, u.created_at AS user_created_at, u.updated_at AS user_updated_at, u.updated_by AS user_updated_by,
 			c.id AS comment_id, c.post_id as comment_post_id ,c.user_id AS comment_user_id, c.description AS comment_description, 
 			c.status AS comment_status, c.created_at AS comment_created_at, c.updated_at AS comment_updated_at, c.updated_by AS comment_updated_by,
@@ -364,6 +366,7 @@ func ReadAllCommentsForPostByUserID(postId int, userID int) ([]Comment, error) {
 			&user.Name,
 			&user.Type,
 			&user.Email,
+			&user.ProfilePhoto,
 			&user.Status,
 			&user.CreatedAt,
 			&user.UpdatedAt,
@@ -415,7 +418,7 @@ func ReadAllCommentsForPostByUserID(postId int, userID int) ([]Comment, error) {
 // 	// Updated query to join comments with posts
 // 	selectQuery := `
 // 		SELECT
-// 			u.id AS user_id, u.uuid AS user_uuid, u.username AS user_username, u.name AS user_name, u.type AS user_type, u.email AS user_email,
+// 			u.id AS user_id, u.uuid AS user_uuid, u.username AS user_username, u.name AS user_name, u.type AS user_type, u.email AS user_email, IFNULL(u.profile_photo, '') as user_profile_photo,
 // 			u.status AS user_status, u.created_at AS user_created_at, u.updated_at AS user_updated_at, u.updated_by AS user_updated_by,
 // 			c.id AS comment_id, c.user_id AS comment_user_id, c.description AS comment_description,
 // 			c.status AS comment_status, c.created_at AS comment_created_at, c.updated_at AS comment_updated_at, c.updated_by AS comment_updated_by,
@@ -446,6 +449,7 @@ func ReadAllCommentsForPostByUserID(postId int, userID int) ([]Comment, error) {
 // 			&user.Name,
 // 			&user.Type,
 // 			&user.Email,
+// 			&user.ProfilePhoto,
 // 			&user.Status,
 // 			&user.CreatedAt,
 // 			&user.UpdatedAt,
@@ -492,7 +496,7 @@ func ReadAllCommentsOfUserForPost(postId int, userId int) ([]Comment, error) {
 			p.status AS post_status, p.created_at AS post_created_at, p.updated_at AS post_updated_at, p.updated_by AS post_updated_by,
 			c.id AS comment_id, c.user_id AS comment_user_id, c.description AS comment_description, 
 			c.status AS comment_status, c.created_at AS comment_created_at, c.updated_at AS comment_updated_at, c.updated_by AS comment_updated_by,
-			u.id AS user_id, u.uuid AS user_uuid, u.username AS user_username, u.name AS user_name, u.type AS user_type, u.email AS user_email,  
+			u.id AS user_id, u.uuid AS user_uuid, u.username AS user_username, u.name AS user_name, u.type AS user_type, u.email AS user_email, IFNULL(u.profile_photo, '') as user_profile_photo, 
 			u.status AS user_status, u.created_at AS user_created_at, u.updated_at AS user_updated_at, u.updated_by AS user_updated_by
 		FROM comments c
 		INNER JOIN posts p ON c.post_id = p.id AND p.status != 'delete' AND c.status != 'delete' AND p.id = ?
@@ -537,6 +541,7 @@ func ReadAllCommentsOfUserForPost(postId int, userId int) ([]Comment, error) {
 			&user.Name,
 			&user.Type,
 			&user.Email,
+			&user.ProfilePhoto,
 			&user.Status,
 			&user.CreatedAt,
 			&user.UpdatedAt,

@@ -13,6 +13,8 @@ DROP TABLE IF EXISTS "users";
 CREATE TABLE "categories" (
   "id" INTEGER PRIMARY KEY AUTOINCREMENT,
   "name" TEXT NOT NULL,
+  "color" TEXT NOT NULL,
+  "icon" TEXT NOT NULL,
   "status" TEXT NOT NULL CHECK ("status" IN ('enable', 'disable', 'delete')) DEFAULT 'enable',
   "created_at" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   "created_by" INTEGER NOT NULL,
@@ -147,8 +149,9 @@ CREATE TABLE "sessions" (
 INSERT INTO users(uuid, type,name,username,password, email)
 VALUES ('67921bdd-8458-800e-b9d4-065a43242cd3', 'admin', 'admin', 'admin', '$2a$10$DN.v/NkfQjmPaTTz15x0E.u8l2R9.HnB12DpDVMdRPeQZDfMwovSa', 'admin@admin');
 
-INSERT INTO categories (name, created_by)
-VALUES ('Art', 1), ('Science', 1), ('News', 1), ('Technology', 1), ('Lifestyle', 1);
+INSERT INTO categories (name, color, icon, created_by)
+VALUES ('Art', '#5340C8', '<i class="fa-solid fa-palette"></i>', 1), ('Science', '#7F59FE', '<i class="fa-solid fa-atom"></i>', 1),
+ ('News', '#0BC4D5', '<i class="fa-solid fa-rss"></i>', 1), ('Technology', '#C34CB4', '<i class="fa-solid fa-microchip"></i>', 1), ('Lifestyle', '#C44343', '<i class="fa-brands fa-pagelines"></i>', 1);
 
 -- INSERT INTO posts(uuid, title, description, user_id)
 -- VALUES ('f9edb8d6-c739-4d6f-aaa4-9b298f2e1552', 'first post', 'this is first post of forum that is made by admin', 1);
