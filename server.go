@@ -133,10 +133,10 @@ func finishTest() {
 // main initializes the HTTP server, registers routes, and starts listening for incoming requests.
 func main() {
 	// remove fresh version of database
-	if err := db.ExecuteSQLFile("db/forum.sql"); err != nil {
-		log.Fatalf("Error: %v", err)
-		os.Exit(1)
-	}
+	// if err := db.ExecuteSQLFile("db/forum.sql"); err != nil {
+	// 	log.Fatalf("Error: %v", err)
+	// 	os.Exit(1)
+	// }
 
 	// Setup routes using gorilla mux
 	router := routes.SetupRoutes()

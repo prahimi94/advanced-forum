@@ -148,13 +148,50 @@ INSERT INTO users(uuid, type,name,username,password, email)
 VALUES ('67921bdd-8458-800e-b9d4-065a43242cd3', 'admin', 'admin', 'admin', '$2a$10$DN.v/NkfQjmPaTTz15x0E.u8l2R9.HnB12DpDVMdRPeQZDfMwovSa', 'admin@admin');
 
 INSERT INTO categories (name, created_by)
-VALUES ('art', 1), ('science', 1), ('news', 1);
+VALUES ('Art', 1), ('Science', 1), ('News', 1), ('Technology', 1), ('Lifestyle', 1);
 
-INSERT INTO posts(uuid, title, description, user_id)
-VALUES ('f9edb8d6-c739-4d6f-aaa4-9b298f2e1552', 'first post', 'this is first post of forum that is made by admin', 1);
+-- INSERT INTO posts(uuid, title, description, user_id)
+-- VALUES ('f9edb8d6-c739-4d6f-aaa4-9b298f2e1552', 'first post', 'this is first post of forum that is made by admin', 1);
+
+INSERT INTO posts (uuid, title, description, user_id) VALUES 
+('74ead645-b5aa-4622-b32f-ee8a844cce9c', 
+'The Evolution of Abstract Art', 
+'A look at how abstract art has transformed from traditional styles to modern digital expressions. 
+  This post explores key movements like Cubism, Surrealism, and Expressionism, and how artists today use technology to push creative boundaries.',
+1),
+
+('dc30b21d-1bad-4dff-907c-9d31dbe54b9f',
+'Quantum Computing: The Next Frontier', 
+ 'Quantum computing leverages the principles of quantum mechanics to perform calculations exponentially faster than classical computers. 
+  This post delves into qubits, superposition, and real-world applications in cryptography and AI.', 
+ 1),
+
+('11c33158-3b99-43d8-8731-38409c6cd87a', 
+'Breaking: Major Space Discovery Announced', 
+ 'Astronomers have discovered a new Earth-like planet within the habitable zone of its star. 
+  With the potential to host liquid water, this finding could be a game-changer in the search for extraterrestrial life.', 
+ 1),
+
+('0c59ce51-dde6-4ff4-aac9-4c8fdc705610', 
+'AI and the Future of Digital Art', 
+ 'Artificial Intelligence is transforming digital art creation. From AI-generated paintings to deep learning-based creative tools, 
+  this post explores how algorithms are pushing the boundaries of what we consider original artwork.', 
+ 1),
+
+('435ac036-77eb-41bc-8124-3d9521d62c19',
+'The Role of CRISPR in Genetic Engineering', 
+ 'CRISPR technology has revolutionized genetic engineering, allowing scientists to edit DNA with unprecedented precision. 
+  This breakthrough has significant implications for medicine, agriculture, and even species preservation.', 
+ 1),
+
+('87166c00-58dc-4780-8df2-1b73ec99bcad', 
+'Global Economic Trends in 2025', 
+ 'As the world recovers from economic shifts, new trends are shaping global markets. This report provides an in-depth analysis of inflation rates, 
+  emerging industries, and how digital currencies are impacting financial landscapes.', 
+ 1);
 
 INSERT INTO post_categories(post_id, category_id, created_by)
-VALUES (1, 1, 1), (1, 2, 1);
+VALUES (1, 1, 1), (2, 2, 1), (2, 5, 1), (3, 3, 1), (4, 1, 1), (4, 3, 1), (5, 2, 1), (6, 3, 1);
 
 INSERT INTO comments(post_id, description, user_id)
 VALUES (1, 'this is first post comment that is made by admin', 1);

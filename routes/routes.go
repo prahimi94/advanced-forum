@@ -17,7 +17,7 @@ func SetupRoutes() *mux.Router {
 	router.PathPrefix("/css/").Handler(http.FileServer(http.Dir("assets/")))
 	router.PathPrefix("/js/").Handler(http.FileServer(http.Dir("assets/")))
 	router.PathPrefix("/img/").Handler(http.FileServer(http.Dir("assets/")))
-	router.PathPrefix("/uploads/").Handler(http.FileServer(http.Dir("assets/")))
+	router.PathPrefix("/uploads/").Handler(http.FileServer(http.Dir("static/")))
 
 	// Public routes (directly registered)
 	router.HandleFunc("/", forumManagementControllers.MainPageHandler).Methods("GET")
@@ -34,7 +34,7 @@ func SetupRoutes() *mux.Router {
 	protectedRoutes.Use(middlewares.AuthMiddleware) // Apply AuthMiddleware to protectedRoutes routes
 	protectedRoutes.HandleFunc("/newPost/", forumManagementControllers.CreatePost).Methods("GET", "POST")
 	protectedRoutes.HandleFunc("/submitPost", forumManagementControllers.SubmitPost).Methods("POST")
-	protectedRoutes.HandleFunc("/editPost", forumManagementControllers.EditPost).Methods("GET", "POST")
+	protectedRoutes.HandleFunc("/editPost/{id}", forumManagementControllers.EditPost).Methods("GET")
 	protectedRoutes.HandleFunc("/updatePost", forumManagementControllers.UpdatePost).Methods("POST")
 	protectedRoutes.HandleFunc("/deletePost", forumManagementControllers.DeletePost).Methods("POST")
 	protectedRoutes.HandleFunc("/myCreatedPosts/", forumManagementControllers.ReadMyCreatedPosts).Methods("GET")
