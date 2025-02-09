@@ -7,7 +7,13 @@
     <div class="container-form">
 
         <div class="mb-3" style="text-align: center;">
-            <img src="/uploads/{{.LoginUser.ProfilePhoto}}" alt="user image" class="rounded-circle center" style="width: 150px; height: 150px; cursor: pointer;">
+            <div class="rounded-circle">
+                {{if .LoginUser.ProfilePhoto}}
+                <img src="/uploads/{{.LoginUser.ProfilePhoto}}" alt="user image" class="rounded-circle center" style="width: 150px; height: 150px; cursor: pointer;" >
+                {{else}}
+                <i class="fa-solid fa-user" style="font-size: 3rem;"></i>
+                {{end}}
+            </div>
         </div>
 
         <h4 class="text-center mb-4">Edit Profile</h4>

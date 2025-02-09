@@ -15,7 +15,12 @@ body{
     align-items: center;
     min-height: 100vh;
     /* background: linear-gradient(90deg, #e2e2e2, #c9d6ff); */
-    background: linear-gradient(90deg, #e2e2e2, rgb(252, 242, 229));
+    /* background: linear-gradient(90deg, #e2e2e2, rgb(252, 242, 229)); */
+    background: rgb(239,245,249);
+    background: -moz-linear-gradient(220deg, rgba(239,245,249,1) 0%, rgba(246,235,248,1) 35%, rgba(239,245,249,1) 100%);
+    background: -webkit-linear-gradient(220deg, rgba(239,245,249,1) 0%, rgba(246,235,248,1) 35%, rgba(239,245,249,1) 100%);
+    background: linear-gradient(220deg, rgba(239,245,249,1) 0%, rgba(246,235,248,1) 35%, rgba(239,245,249,1) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#eff5f9",endColorstr="#eff5f9",GradientType=1);
 }
 
 .container{
@@ -24,14 +29,15 @@ body{
     height: 550px;
     background: #fff;
     margin: 20px;
-    border-radius: 30px;
-    box-shadow: 0 0 30px rgba(0, 0, 0, .2);
+    border-radius: 25px;
+    box-shadow: 5px 0 30px rgba(158, 158, 158, 0.2);
     overflow: hidden;
 }
 
     .container h1{
         font-size: 36px;
         margin: -10px 0;
+        color: #505050;
     }
 
     .container p{
@@ -70,7 +76,7 @@ form{ width: 100%; }
         width: 100%;
         padding: 13px 50px 13px 20px;
         background: #eee;
-        border-radius: 8px;
+        border-radius: 18px;
         border: none;
         outline: none;
         font-size: 16px;
@@ -89,6 +95,7 @@ form{ width: 100%; }
         top: 50%;
         transform: translateY(-50%);
         font-size: 20px;
+        color: #505050;
     }
 
 .forgot-link{ margin: -15px 0 15px; }
@@ -102,13 +109,18 @@ form{ width: 100%; }
     height: 48px;
     /* background: #7494ec; */
     background: #198754;
-    border-radius: 8px;
+    border-radius: 18px;
     box-shadow: 0 0 10px rgba(0, 0, 0, .1);
     border: none;
     cursor: pointer;
     font-size: 16px;
     color: #fff;
     font-weight: 600;
+    transition: background 0.5s;
+}
+.btn:hover{
+    background: #105f3a;
+    color: #fff;
 }
 
 .social-icons{
@@ -139,9 +151,14 @@ form{ width: 100%; }
         width: 300%;
         height: 100%;
         /* background: #7494ec; */
-        background: rgb(255 193 7);
+        /* background: rgb(255 193 7); */
+        background: rgb(83,61,225);
+        background: -moz-linear-gradient(0deg, rgba(83,61,225,1) 0%, rgba(65,48,179,1) 100%);
+        background: -webkit-linear-gradient(0deg, rgba(83,61,225,1) 0%, rgba(65,48,179,1) 100%);
+        background: linear-gradient(0deg, rgba(83,61,225,1) 0%, rgba(65,48,179,1) 100%);
+        filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#533de1",endColorstr="#4130b3",GradientType=1);
         /* border: 2px solid red; */
-        border-radius: 150px;
+        border-radius: 100px;
         z-index: 2;
         transition: 1.8s ease-in-out;
     }
@@ -185,9 +202,13 @@ form{ width: 100%; }
     .toggle-panel .btn{
         width: 160px;
         height: 46px;
-        background: transparent;
         border: 2px solid #fff;
         box-shadow: none;
+        transition: background 0.5s;
+        background: #533DE1;
+    }
+    .toggle-panel .btn:hover{
+        background: #4130b3;
     }
 
     

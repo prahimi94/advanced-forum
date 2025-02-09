@@ -7,7 +7,7 @@
     <div class="container-form">
         <h4 class="text-center mb-4">Create Post</h4>
         
-        <form action="/updatePost" method="post">
+        <form enctype="multipart/form-data" action="/updatePost" method="post">
             <input type="hidden" id="selectedCategories" value='[
     {{range $index, $cat := .Post.Categories}}{{if $index}},{{end}}{"ID": {{$cat.ID}}, "Name": "{{$cat.Name}}"}{{end}}
 ]'>
@@ -28,10 +28,10 @@
             <div class="mb-3">
                 <textarea class="form-control" placeholder="Description" rows="4" name="description">{{.Post.Description}}</textarea>
             </div>
-            <!-- <div class="mb-3 text-center border p-3 rounded">
+            <div class="mb-3 text-center border p-3 rounded">
                 <p class="text-muted">Attach an image or video (optional)</p>
-                <input type="file" class="form-control" name="file">
-            </div> -->
+                <input type="file" class="form-control" name="file" multiple>
+            </div>
             <button type="submit" class="btn btn-success w-100">Edit post</button>
         </form>
     </div>

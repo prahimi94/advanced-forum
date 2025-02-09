@@ -17,34 +17,38 @@
             <div class="col-md-12">
                 <ul class="breadcrumb">
                     <li>
-                        <a class="nav-link text-secondary" href="/">← Back to posts</a>
+                        <a class="nav-link text-secondary" href="/"><i class="fa-solid fa-arrow-left"></i> <span>Back to posts</span></a>
                     </li>
                 </ul>
             </div>
         </div>
 
-        <h3>Posts related to "{{.SearchTerm}}"</h3>
-        <form class="row g-2 my-3" method="get" action="/filterPosts/">
-
-            <div class="col-11">
-                <input type="text" name="post_info" class="form-control" placeholder="Search">
+        <h3 class="search-title">Posts related to "{{.SearchTerm}}"</h3>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="search-box-content">
+                    <form class="d-flex mt-3 mt-lg-0" method="get" action="/filterPosts">
+                        <input type="text" name="post_info" class="form-control me-2" placeholder="Search">
+                        <button type="submit" class="btn btn-outline-success">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </button>
+                    </form>
+                </div>
             </div>
-            <div class="col-1">
-                <button type="submit" class="btn btn-outline-success">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                </button>
-            </div>
-            
-        </form>
-        
-        <div class="categories mb-3">
-            {{range .Categories}}
-            <a class="btn btn-outline-secondary" href="/posts/{{.Name}}">{{.Name}}</a>
-            {{end}}
         </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="categories mb-3">
+                    {{range .Categories}}
+                        <a class="btn btn-outline-secondary" href="/posts/{{.Name}}">{{.Name}}</a>
+                    {{end}}
+                </div>
+            </div>
+        </div>
+
+        <div class="divaider mb-4"></div>
         
-        
-        {{template "posts" .Posts}}
+        {{template "posts" .}}
     </div>
     
     {{template "footer"}}
