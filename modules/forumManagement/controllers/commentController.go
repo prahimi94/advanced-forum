@@ -4,6 +4,7 @@ import (
 	"forum/middlewares"
 	errorManagementControllers "forum/modules/errorManagement/controllers"
 	"forum/modules/forumManagement/models"
+	"forum/utils"
 	"net/http"
 	"strconv"
 
@@ -124,7 +125,7 @@ func SubmitComment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	post_id_str := r.FormValue("post_id")
-	description := r.FormValue("description")
+	description := utils.SanitizeInput(r.FormValue("description"))
 	if len(post_id_str) == 0 || len(description) == 0 {
 		errorManagementControllers.HandleErrorPage(w, r, errorManagementControllers.BadRequestError)
 		return
@@ -214,8 +215,8 @@ func UpdateComment(w http.ResponseWriter, r *http.Request) {
 	}
 
 	idStr := r.FormValue("comment_id")
-	post_uuid := r.FormValue("post_uuid")
-	description := r.FormValue("description")
+	post_uuid := utils.SanitizeInput(r.FormValue("post_uuid"))
+	description := utils.SanitizeInput(r.FormValue("description"))
 
 	if len(idStr) == 0 || len(post_uuid) == 0 || len(description) == 0 {
 		errorManagementControllers.HandleErrorPage(w, r, errorManagementControllers.BadRequestError)
@@ -263,7 +264,7 @@ func DeleteComment(w http.ResponseWriter, r *http.Request) {
 	}
 
 	idStr := r.FormValue("comment_id")
-	post_uuid := r.FormValue("post_uuid")
+	post_uuid := utils.SanitizeInput(r.FormValue("post_uuid"))
 
 	if len(idStr) == 0 || len(post_uuid) == 0 {
 		errorManagementControllers.HandleErrorPage(w, r, errorManagementControllers.BadRequestError)

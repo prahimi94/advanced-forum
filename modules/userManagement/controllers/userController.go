@@ -74,15 +74,15 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		errorManagementControllers.HandleErrorPage(w, r, errorManagementControllers.BadRequestError)
 		return
 	}
-	username := r.FormValue("username")
-	email := r.FormValue("email")
-	password := r.FormValue("password")
+	username := utils.SanitizeInput(r.FormValue("username"))
+	email := utils.SanitizeInput(r.FormValue("email"))
+	password := utils.SanitizeInput(r.FormValue("password"))
 	if len(username) == 0 || len(email) == 0 || len(password) == 0 {
 		// errorManagementControllers.HandleErrorPage(w, r, errorManagementControllers.BadRequestError)
 		renderAuthPage(w, "Username, email and password are required.")
 		return
 	}
-	if !strings.Contains(email, "@") {
+	if !strings.Contains(email, "@") || !strings.Contains(email, ".") {
 		renderAuthPage(w, "Invalid email address!")
 		return
 	}
@@ -140,8 +140,8 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	username := r.FormValue("username")
-	password := r.FormValue("password")
+	username := utils.SanitizeInput(r.FormValue("username"))
+	password := utils.SanitizeInput(r.FormValue("password"))
 	if len(username) == 0 || len(password) == 0 {
 		// errorManagementControllers.HandleErrorPage(w, r, errorManagementControllers.BadRequestError)
 		// return
@@ -299,7 +299,7 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 	// Limit the request body size
 	r.Body = http.MaxBytesReader(w, r.Body, maxUploadSize)
 
-	name := r.FormValue("name")
+	name := utils.SanitizeInput(r.FormValue("name"))
 
 	if len(name) == 0 {
 		errorManagementControllers.HandleErrorPage(w, r, errorManagementControllers.BadRequestError)

@@ -493,8 +493,8 @@ func SubmitPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	title := r.FormValue("title")
-	description := r.FormValue("description")
+	title := utils.SanitizeInput(r.FormValue("title"))
+	description := utils.SanitizeInput(r.FormValue("description"))
 	categories := r.Form["categories"]
 	if len(title) == 0 || len(description) == 0 || len(categories) == 0 {
 		errorManagementControllers.HandleErrorPage(w, r, errorManagementControllers.BadRequestError)
@@ -630,9 +630,9 @@ func UpdatePost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	idStr := r.FormValue("id")
-	uuid := r.FormValue("uuid")
-	title := r.FormValue("title")
-	description := r.FormValue("description")
+	uuid := utils.SanitizeInput(r.FormValue("uuid"))
+	title := utils.SanitizeInput(r.FormValue("title"))
+	description := utils.SanitizeInput(r.FormValue("description"))
 	categories := r.Form["categories"]
 
 	if len(idStr) == 0 || len(title) == 0 || len(description) == 0 || len(categories) == 0 {
