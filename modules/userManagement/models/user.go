@@ -130,7 +130,7 @@ func ReadAllUsers() ([]User, error) {
 	// Query the records
 	rows, selectError := db.Query(`
         SELECT u.id as user_id, u.name as user_name, u.username as user_username, u.email as user_email, 
-		u.profile_photo as user_profile_photo, u.status as user_status, u.created_at as user_created_at, 
+		IFNULL(u.profile_photo, '') as profile_photo, u.status as user_status, u.created_at as user_created_at, 
 		u.updated_at as user_updated_at, u.updated_by as user_updated_by
 		FROM users u
 		WHERE u.status != 'delete'
@@ -175,7 +175,7 @@ func ReadUserByID(user_id int) (User, error) {
 	// Query the records
 	rows, selectError := db.Query(`
         SELECT u.id as user_id, u.name as user_name, u.username as user_username, u.email as user_email, 
-		u.profile_photo as user_profile_photo, u.status as user_status, u.created_at as user_created_at, 
+		IFNULL(u.profile_photo, '') as profile_photo, u.status as user_status, u.created_at as user_created_at, 
 		u.updated_at as user_updated_at, u.updated_by as user_updated_by
 		FROM users u
 		WHERE u.status != 'delete'

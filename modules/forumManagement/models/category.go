@@ -11,16 +11,19 @@ import (
 
 // Category struct represents the user data model
 type Category struct {
-	ID        int                       `json:"id"`
-	Name      string                    `json:"name"`
-	Color     string                    `json:"color"`
-	Icon      string                    `json:"icon"`
-	Status    string                    `json:"status"`
-	CreatedAt time.Time                 `json:"created_at"`
-	UpdatedAt *time.Time                `json:"updated_at"`
-	CreatedBy int                       `json:"created_by"`
-	UpdatedBy *int                      `json:"updated_by"`
-	User      userManagementModels.User `json:"user"` // Embedded user data
+	ID             int                       `json:"id"`
+	Name           string                    `json:"name"`
+	Color          string                    `json:"color"`
+	Icon           string                    `json:"icon"`
+	Status         string                    `json:"status"`
+	CreatedAt      time.Time                 `json:"created_at"`
+	UpdatedAt      *time.Time                `json:"updated_at"`
+	CreatedBy      int                       `json:"created_by"`
+	UpdatedBy      *int                      `json:"updated_by"`
+	User           userManagementModels.User `json:"user"` // Embedded user data
+	PostsCount     *int                      `json:"posts_count"`
+	CommentsCount  *int                      `json:"comments_count"`
+	PostLikesCount *int                      `json:"post_likes_count"`
 }
 
 func InsertCategory(category *Category) (int, error) {
@@ -95,6 +98,87 @@ func UpdateStatuCategory(categoryId int, status string, userId int) error {
 	}
 
 	return nil
+}
+
+func AdminReadAllCategories() ([]Category, error) {
+	db := db.OpenDBConnection()
+	defer db.Close() // Close the connection after the function finishes
+
+	// Query the records
+	rows, selectError := db.Query(`
+        SELECT c.id as category_id, c.name as category_name, c.color as category_color, c.icon as category_icon, c.status as category_status, 
+               c.created_at as category_created_at, c.created_by as category_created_by, 
+               c.updated_at as category_updated_at, c.updated_by as category_updated_by,
+               u.id as user_id, u.name as user_name, u.username as user_username, u.email as user_email, IFNULL(u.profile_photo, '') as user_profile_photo,
+			   (SELECT COUNT(DISTINCT p.id) 
+			   	FROM post_categories pc
+				INNER JOIN posts p
+					ON pc.post_id = p.id
+				WHERE p.status != 'delete'
+				AND pc.status != 'delete'
+				AND pc.category_id = c.id
+			   ) as posts_count,
+			   (SELECT COUNT(DISTINCT com.id) 
+			   	FROM post_categories pc
+				INNER JOIN posts p
+					ON pc.post_id = p.id
+				INNER JOIN comments com
+					ON com.post_id = p.id
+					AND com.status != 'delete'
+				WHERE p.status != 'delete'
+				AND pc.status != 'delete'
+				AND pc.category_id = c.id
+			   ) as comments_count,
+			   (SELECT COUNT(DISTINCT pl.id) 
+			   	FROM post_categories pc
+				INNER JOIN posts p
+					ON pc.post_id = p.id
+				INNER JOIN post_likes pl
+					ON pl.post_id = p.id
+					AND pl.status != 'delete'
+				WHERE p.status != 'delete'
+				AND pc.status != 'delete'
+				AND pc.category_id = c.id
+			   ) as post_likes_count
+        FROM categories c
+        INNER JOIN users u ON c.created_by = u.id
+        WHERE c.status != 'delete';
+    `)
+	if selectError != nil {
+		return nil, selectError
+	}
+	defer rows.Close()
+
+	var categories []Category
+
+	for rows.Next() {
+		var category Category
+		var user userManagementModels.User
+
+		// Scan the data into variables
+		err := rows.Scan(
+			&category.ID, &category.Name, &category.Color, &category.Icon, &category.Status, &category.CreatedAt, &category.CreatedBy,
+			&category.UpdatedAt, &category.UpdatedBy,
+			&user.ID, &user.Name, &user.Username, &user.Email, &user.ProfilePhoto,
+			&category.PostsCount, &category.CommentsCount, &category.PostLikesCount,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("error scanning row: %v", err)
+		}
+
+		// Assign the user to the category
+		category.User = user
+
+		// Append category to the categories slice
+		categories = append(categories, category)
+	}
+
+	// Check for any errors during row iteration
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("row iteration error: %v", err)
+	}
+
+	return categories, nil
 }
 
 func ReadAllCategories() ([]Category, error) {

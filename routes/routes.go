@@ -17,6 +17,7 @@ func SetupRoutes() *mux.Router {
 	router.PathPrefix("/css/").Handler(http.FileServer(http.Dir("assets/")))
 	router.PathPrefix("/js/").Handler(http.FileServer(http.Dir("assets/")))
 	router.PathPrefix("/img/").Handler(http.FileServer(http.Dir("assets/")))
+	router.PathPrefix("/vendor/").Handler(http.FileServer(http.Dir("assets/")))
 	router.PathPrefix("/uploads/").Handler(http.FileServer(http.Dir("static/")))
 
 	// Public routes (directly registered)
@@ -53,6 +54,7 @@ func SetupRoutes() *mux.Router {
 	adminRoutes.HandleFunc("/", forumManagementControllers.AdminMainPageHandler).Methods("GET")
 	// adminRoutes.HandleFunc("/dashboard", forumManagementControllers.AdminDashboardHandler).Methods("GET")
 	adminRoutes.HandleFunc("/users", userManagementControllers.AdminReadAllUsers).Methods("GET")
+	adminRoutes.HandleFunc("/posts", forumManagementControllers.AdminReadAllPosts).Methods("GET")
 	// adminRoutes.HandleFunc("/posts", adminControllers.ManagePosts).Methods("GET")
 	// adminRoutes.HandleFunc("/deleteUser", adminControllers.DeleteUser).Methods("POST")
 

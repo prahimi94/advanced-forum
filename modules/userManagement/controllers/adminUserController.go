@@ -16,24 +16,49 @@ func AdminReadAllUsers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if r.URL.Path != "/admin/users" {
+		// If the URL is not exactly "/", respond with 404
+		errorManagementControllers.HandleErrorPage(w, r, errorManagementControllers.NotFoundError)
+		return
+	}
+
 	users, err := models.ReadAllUsers()
 	if err != nil {
+		fmt.Println(3)
 		errorManagementControllers.HandleErrorPage(w, r, errorManagementControllers.InternalServerError)
 		return
 	}
 
+	data_obj_sender := struct {
+		LoginUser models.User
+		Users     []models.User
+	}{
+		LoginUser: models.User{},
+		Users:     users,
+	}
+
+	loginStatus, loginUser, _, checkLoginError := CheckLogin(w, r)
+	if checkLoginError != nil {
+		errorManagementControllers.HandleErrorPage(w, r, errorManagementControllers.InternalServerError)
+		return
+	}
+	if loginStatus {
+		data_obj_sender.LoginUser = loginUser
+	}
+
 	// Create a template with a function map
-	tmpl, err := template.New("users.html").Funcs(template.FuncMap{
+	tmpl, err := template.New("admin_users.html").Funcs(template.FuncMap{
 		"formatDate": utils.FormatDate, // Register function globally
 	}).ParseFiles(
-		publicUrl + "users.html",
+		publicUrl+"admin_users.html",
+		forumPublicUrl+"templates/footer.html",
 	)
 	if err != nil {
 		errorManagementControllers.HandleErrorPage(w, r, errorManagementControllers.InternalServerError)
 		return
 	}
 
-	err = tmpl.Execute(w, users)
+	err = tmpl.Execute(w, data_obj_sender)
 	if err != nil {
 		errorManagementControllers.HandleErrorPage(w, r, errorManagementControllers.InternalServerError)
 		return

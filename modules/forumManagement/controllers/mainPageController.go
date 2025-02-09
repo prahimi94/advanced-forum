@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	errorManagementControllers "forum/modules/errorManagement/controllers"
 	"forum/modules/forumManagement/models"
 	"forum/utils"
@@ -97,7 +98,7 @@ func AdminMainPageHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	categories, err := models.ReadAllCategories()
+	categories, err := models.AdminReadAllCategories()
 	if err != nil {
 		errorManagementControllers.HandleErrorPage(w, r, errorManagementControllers.InternalServerError)
 		return
@@ -105,6 +106,28 @@ func AdminMainPageHandler(w http.ResponseWriter, r *http.Request) {
 
 	posts, err := models.ReadAllPosts()
 	if err != nil {
+		fmt.Println(1)
+		errorManagementControllers.HandleErrorPage(w, r, errorManagementControllers.InternalServerError)
+		return
+	}
+
+	comments, err := models.ReadAllComments()
+	if err != nil {
+		fmt.Println(2)
+		errorManagementControllers.HandleErrorPage(w, r, errorManagementControllers.InternalServerError)
+		return
+	}
+
+	users, err := userManagementModels.ReadAllUsers()
+	if err != nil {
+		fmt.Println(3)
+		errorManagementControllers.HandleErrorPage(w, r, errorManagementControllers.InternalServerError)
+		return
+	}
+
+	postLikes, err := models.ReadAllPostsLikes()
+	if err != nil {
+		fmt.Println(3)
 		errorManagementControllers.HandleErrorPage(w, r, errorManagementControllers.InternalServerError)
 		return
 	}
@@ -112,10 +135,16 @@ func AdminMainPageHandler(w http.ResponseWriter, r *http.Request) {
 	data_obj_sender := struct {
 		LoginUser  userManagementModels.User
 		Posts      []models.Post
+		Comments   []models.Comment
+		Users      []userManagementModels.User
+		PostLikes  []models.PostLike
 		Categories []models.Category
 	}{
 		LoginUser:  userManagementModels.User{},
 		Posts:      posts,
+		Comments:   comments,
+		Users:      users,
+		PostLikes:  postLikes,
 		Categories: categories,
 	}
 
@@ -129,10 +158,10 @@ func AdminMainPageHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Create a template with a function map
-	tmpl, err := template.New("index.html").Funcs(template.FuncMap{
+	tmpl, err := template.New("admin_dashboard.html").Funcs(template.FuncMap{
 		"formatDate": utils.FormatDate, // Register function globally
 	}).ParseFiles(
-		publicUrl+"index.html",
+		publicUrl+"admin_dashboard.html",
 		publicUrl+"templates/header.html",
 		publicUrl+"templates/navbar.html",
 		publicUrl+"templates/hero.html",

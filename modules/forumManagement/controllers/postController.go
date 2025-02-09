@@ -45,6 +45,54 @@ func ReadAllPosts(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func AdminReadAllPosts(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		errorManagementControllers.HandleErrorPage(w, r, errorManagementControllers.MethodNotAllowedError)
+		return
+	}
+
+	posts, err := models.ReadAllPosts()
+	if err != nil {
+		errorManagementControllers.HandleErrorPage(w, r, errorManagementControllers.InternalServerError)
+		return
+	}
+
+	data_obj_sender := struct {
+		LoginUser userManagementModels.User
+		Posts     []models.Post
+	}{
+		LoginUser: userManagementModels.User{},
+		Posts:     posts,
+	}
+
+	loginStatus, loginUser, _, checkLoginError := userManagementControllers.CheckLogin(w, r)
+	if checkLoginError != nil {
+		errorManagementControllers.HandleErrorPage(w, r, errorManagementControllers.InternalServerError)
+		return
+	}
+	if loginStatus {
+		data_obj_sender.LoginUser = loginUser
+	}
+
+	// Create a template with a function map
+	tmpl, err := template.New("admin_posts.html").Funcs(template.FuncMap{
+		"formatDate": utils.FormatDate, // Register function globally
+	}).ParseFiles(
+		publicUrl+"admin_posts.html",
+		publicUrl+"templates/footer.html",
+	)
+	if err != nil {
+		errorManagementControllers.HandleErrorPage(w, r, errorManagementControllers.InternalServerError)
+		return
+	}
+
+	err = tmpl.Execute(w, data_obj_sender)
+	if err != nil {
+		errorManagementControllers.HandleErrorPage(w, r, errorManagementControllers.InternalServerError)
+		return
+	}
+}
+
 func ReadPostsByCategory(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		errorManagementControllers.HandleErrorPage(w, r, errorManagementControllers.MethodNotAllowedError)
