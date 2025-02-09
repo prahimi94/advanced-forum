@@ -55,6 +55,7 @@ func SetupRoutes() *mux.Router {
 	// adminRoutes.HandleFunc("/dashboard", forumManagementControllers.AdminDashboardHandler).Methods("GET")
 	adminRoutes.HandleFunc("/users", userManagementControllers.AdminReadAllUsers).Methods("GET")
 	adminRoutes.HandleFunc("/posts", forumManagementControllers.AdminReadAllPosts).Methods("GET")
+	adminRoutes.HandleFunc("/deletePost", forumManagementControllers.AdminDeletePost).Methods("POST")
 	// adminRoutes.HandleFunc("/posts", adminControllers.ManagePosts).Methods("GET")
 	// adminRoutes.HandleFunc("/deleteUser", adminControllers.DeleteUser).Methods("POST")
 

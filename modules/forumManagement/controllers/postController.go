@@ -739,6 +739,47 @@ func DeletePost(w http.ResponseWriter, r *http.Request) {
 	userManagementControllers.RedirectToIndex(w, r)
 }
 
+func AdminDeletePost(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		errorManagementControllers.HandleErrorPage(w, r, errorManagementControllers.MethodNotAllowedError)
+		return
+	}
+
+	loginUser, ok := r.Context().Value(middlewares.AdminKey).(userManagementModels.User)
+	if !ok {
+		errorManagementControllers.HandleErrorPage(w, r, errorManagementControllers.UnauthorizedError)
+		return
+	}
+
+	err := r.ParseForm()
+	if err != nil {
+		errorManagementControllers.HandleErrorPage(w, r, errorManagementControllers.BadRequestError)
+		return
+	}
+
+	idStr := r.FormValue("id")
+
+	if len(idStr) == 0 {
+		errorManagementControllers.HandleErrorPage(w, r, errorManagementControllers.BadRequestError)
+		return
+	}
+
+	post_id, err := strconv.Atoi(idStr)
+	if err != nil {
+		errorManagementControllers.HandleErrorPage(w, r, errorManagementControllers.InternalServerError)
+		return
+	}
+
+	// Update a record while checking duplicates
+	updateError := models.UpdateStatusPost(post_id, "delete", loginUser.ID)
+	if updateError != nil {
+		errorManagementControllers.HandleErrorPage(w, r, errorManagementControllers.InternalServerError)
+		return
+	}
+
+	userManagementControllers.RedirectToAdminIndex(w, r)
+}
+
 func LikePost(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		errorManagementControllers.HandleErrorPage(w, r, errorManagementControllers.MethodNotAllowedError)
