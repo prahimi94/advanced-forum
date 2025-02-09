@@ -11,7 +11,7 @@ import (
 
 func SetupRoutes() *mux.Router {
 	// Initialize a new router
-	router := mux.NewRouter()
+	router := mux.NewRouter().StrictSlash(true)
 
 	// Serve static files
 	router.PathPrefix("/css/").Handler(http.FileServer(http.Dir("assets/")))
@@ -30,20 +30,29 @@ func SetupRoutes() *mux.Router {
 	router.HandleFunc("/filterPosts", forumManagementControllers.FilterPosts).Methods("GET")
 
 	// Protected routes (using middleware)
-	protected := router.PathPrefix("/").Subrouter() // No need to add "/protected"
-	protected.Use(middlewares.AuthMiddleware)       // Apply AuthMiddleware to protected routes
-	protected.HandleFunc("/newPost/", forumManagementControllers.CreatePost).Methods("GET", "POST")
-	protected.HandleFunc("/submitPost", forumManagementControllers.SubmitPost).Methods("POST")
-	protected.HandleFunc("/editPost", forumManagementControllers.EditPost).Methods("GET", "POST")
-	protected.HandleFunc("/updatePost", forumManagementControllers.UpdatePost).Methods("POST")
-	protected.HandleFunc("/deletePost", forumManagementControllers.DeletePost).Methods("POST")
-	protected.HandleFunc("/myCreatedPosts/", forumManagementControllers.ReadMyCreatedPosts).Methods("GET")
-	protected.HandleFunc("/myLikedPosts/", forumManagementControllers.ReadMyLikedPosts).Methods("GET")
-	protected.HandleFunc("/likePost", forumManagementControllers.LikePost).Methods("POST")
-	protected.HandleFunc("/likeComment", forumManagementControllers.LikeComment).Methods("POST")
-	protected.HandleFunc("/submitComment", forumManagementControllers.SubmitComment).Methods("POST")
-	protected.HandleFunc("/updateComment", forumManagementControllers.UpdateComment).Methods("POST")
-	protected.HandleFunc("/deleteComment", forumManagementControllers.DeleteComment).Methods("POST")
+	protectedRoutes := router.PathPrefix("/").Subrouter()
+	protectedRoutes.Use(middlewares.AuthMiddleware) // Apply AuthMiddleware to protectedRoutes routes
+	protectedRoutes.HandleFunc("/newPost/", forumManagementControllers.CreatePost).Methods("GET", "POST")
+	protectedRoutes.HandleFunc("/submitPost", forumManagementControllers.SubmitPost).Methods("POST")
+	protectedRoutes.HandleFunc("/editPost", forumManagementControllers.EditPost).Methods("GET", "POST")
+	protectedRoutes.HandleFunc("/updatePost", forumManagementControllers.UpdatePost).Methods("POST")
+	protectedRoutes.HandleFunc("/deletePost", forumManagementControllers.DeletePost).Methods("POST")
+	protectedRoutes.HandleFunc("/myCreatedPosts/", forumManagementControllers.ReadMyCreatedPosts).Methods("GET")
+	protectedRoutes.HandleFunc("/myLikedPosts/", forumManagementControllers.ReadMyLikedPosts).Methods("GET")
+	protectedRoutes.HandleFunc("/likePost", forumManagementControllers.LikePost).Methods("POST")
+	protectedRoutes.HandleFunc("/likeComment", forumManagementControllers.LikeComment).Methods("POST")
+	protectedRoutes.HandleFunc("/submitComment", forumManagementControllers.SubmitComment).Methods("POST")
+	protectedRoutes.HandleFunc("/updateComment", forumManagementControllers.UpdateComment).Methods("POST")
+	protectedRoutes.HandleFunc("/deleteComment", forumManagementControllers.DeleteComment).Methods("POST")
+
+	// Protected routes (using middleware)
+	adminRoutes := router.PathPrefix("/admin").Subrouter()
+	adminRoutes.Use(middlewares.AdminMiddleware) // Apply AdminMiddleware to admin routes
+	adminRoutes.HandleFunc("/", forumManagementControllers.AdminMainPageHandler).Methods("GET")
+	// adminRoutes.HandleFunc("/dashboard", forumManagementControllers.AdminDashboardHandler).Methods("GET")
+	adminRoutes.HandleFunc("/users", userManagementControllers.AdminReadAllUsers).Methods("GET")
+	// adminRoutes.HandleFunc("/posts", adminControllers.ManagePosts).Methods("GET")
+	// adminRoutes.HandleFunc("/deleteUser", adminControllers.DeleteUser).Methods("POST")
 
 	return router
 }

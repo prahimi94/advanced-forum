@@ -29,6 +29,13 @@ var PredefinedErrors = map[string]ErrorPageData{
 		CodeSlice:  splitString(strconv.Itoa(http.StatusUnauthorized)),
 		Info:       "Unauthorized",
 	},
+	"ForbiddenError": {
+		Name:       "ForbiddenError",
+		Code:       strconv.Itoa(http.StatusForbidden),
+		CodeNumber: http.StatusUnauthorized,
+		CodeSlice:  splitString(strconv.Itoa(http.StatusForbidden)),
+		Info:       "Forbidden",
+	},
 	"NotFoundError": {
 		Name:       "NotFoundError",
 		Code:       strconv.Itoa(http.StatusNotFound),
@@ -65,6 +72,7 @@ var publicUrl = "modules/errorManagement/views/"
 var (
 	BadRequestError       = PredefinedErrors["BadRequestError"]
 	UnauthorizedError     = PredefinedErrors["UnauthorizedError"]
+	ForbiddenError        = PredefinedErrors["ForbiddenError"]
 	NotFoundError         = PredefinedErrors["NotFoundError"]
 	MethodNotAllowedError = PredefinedErrors["MethodNotAllowedError"]
 	InternalServerError   = PredefinedErrors["InternalServerError"]

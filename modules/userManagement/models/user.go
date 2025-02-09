@@ -3,6 +3,7 @@ package models
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 	"forum/db"
 	"forum/utils"
 	"log"
@@ -91,6 +92,7 @@ func UpdateProfilePhoto(user *User) error {
 
 	return nil
 }
+
 func AuthenticateUser(username, password string) (bool, int, error) {
 	// Open SQLite database
 	db := db.OpenDBConnection()
@@ -118,4 +120,109 @@ func AuthenticateUser(username, password string) (bool, int, error) {
 
 	// Successful login if no errors occurred
 	return true, userId, nil
+}
+
+func ReadAllUsers() ([]User, error) {
+	db := db.OpenDBConnection()
+	defer db.Close() // Close the connection after the function finishes
+
+	// Query the records
+	rows, selectError := db.Query(`
+        SELECT u.id as user_id, u.name as user_name, u.username as user_username, u.email as user_email, 
+		u.profile_photo as user_profile_photo, u.status as user_status, u.created_at as user_created_at, 
+		u.updated_at as user_updated_at, u.updated_by as user_updated_by
+		FROM users u
+		WHERE u.status != 'delete'
+		AND u.type != 'admin'
+		ORDER BY u.id desc;
+    `)
+	if selectError != nil {
+		return nil, selectError
+	}
+	defer rows.Close()
+
+	var users []User
+
+	for rows.Next() {
+		var user User
+
+		// Scan the post and user data
+		err := rows.Scan(
+			&user.ID, &user.Name, &user.Username, &user.Email,
+			&user.ProfilePhoto, &user.Status, &user.CreatedAt,
+			&user.UpdatedAt, &user.UpdatedBy,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("error scanning row: %v", err)
+		}
+
+		users = append(users, user)
+	}
+
+	// Check for any errors during row iteration
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("row iteration error: %v", err)
+	}
+
+	return users, nil
+}
+
+func ReadUserByID(user_id int) (User, error) {
+	db := db.OpenDBConnection()
+	defer db.Close() // Close the connection after the function finishes
+
+	// Query the records
+	rows, selectError := db.Query(`
+        SELECT u.id as user_id, u.name as user_name, u.username as user_username, u.email as user_email, 
+		u.profile_photo as user_profile_photo, u.status as user_status, u.created_at as user_created_at, 
+		u.updated_at as user_updated_at, u.updated_by as user_updated_by
+		FROM users u
+		WHERE u.status != 'delete'
+		AND u.type != 'admin'
+		AND u.id = ?
+		ORDER BY u.id desc;
+    `, user_id)
+	if selectError != nil {
+		return User{}, selectError
+	}
+	defer rows.Close()
+
+	var user User
+
+	for rows.Next() {
+		// Scan the post and user data
+		err := rows.Scan(
+			&user.ID, &user.Name, &user.Username, &user.Email,
+			&user.ProfilePhoto, &user.Status, &user.CreatedAt,
+			&user.UpdatedAt, &user.UpdatedBy,
+		)
+		if err != nil {
+			return User{}, fmt.Errorf("error scanning row: %v", err)
+		}
+
+	}
+
+	// Check for any errors during row iteration
+	if err := rows.Err(); err != nil {
+		return User{}, fmt.Errorf("row iteration error: %v", err)
+	}
+
+	return user, nil
+}
+
+func UpdateStatusUser(user_id int, status string, login_user_id int) error {
+	db := db.OpenDBConnection()
+	defer db.Close() // Close the connection after the function finishes
+
+	updateQuery := `UPDATE users
+					SET status = ?,
+						updated_at = CURRENT_TIMESTAMP,
+						updated_by = ?
+					WHERE id = ?;`
+	_, updateErr := db.Exec(updateQuery, status, login_user_id, user_id)
+	if updateErr != nil {
+		return updateErr
+	}
+
+	return nil
 }
